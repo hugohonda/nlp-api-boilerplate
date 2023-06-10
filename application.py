@@ -1,8 +1,9 @@
 from app import item_resource
+from app import auth_resource
 from fastapi import FastAPI, APIRouter
-# from api_utils.token_auth import PROTECTED
 
 api_router = APIRouter()
+
 
 def create_app():
     app = FastAPI(
@@ -15,10 +16,15 @@ def create_app():
     )
 
     app.include_router(
+        auth_resource.router,
+        tags=["Authentication"]
+        # dependencies=PROTECTED
+    )
+
+    app.include_router(
         item_resource.router,
         tags=["Items"]
         # dependencies=PROTECTED
     )
 
     return app
-

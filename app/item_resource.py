@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from fastapi import APIRouter
 from typing import List
 from app.items import Item, ItemBase
-from app.elastic import es_client
+from app.gateways.elastic import es_client
 
 router = APIRouter()
 
