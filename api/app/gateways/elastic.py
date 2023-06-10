@@ -5,7 +5,7 @@ load_dotenv()
 
 es_client = Elasticsearch(
     [{
-        'scheme': 'https',
+        'scheme': 'http',
         'host': os.getenv('ELASTIC_HOST', 'elasticsearch'),
         'port': int(os.getenv('ELASTIC_PORT', 9200)),
     }],

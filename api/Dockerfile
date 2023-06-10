@@ -11,13 +11,12 @@ ENV LC_ALL pt_BR.UTF-8
 ENV LANGUAGE pt_BR:en
 ENV TZ=America/Sao_Paulo
 
-RUN pip install --upgrade pip>=22.3.1
-COPY ./requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip>=23.1.2
+COPY ./api/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY ./app /app/app
-COPY ./application.py /app/application.py
-COPY ./main.py /app/main.py
+COPY ./api/app /app/app
+COPY ./api/main.py /app/main.py
 
 WORKDIR /app
 

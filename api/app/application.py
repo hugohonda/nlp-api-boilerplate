@@ -1,5 +1,5 @@
-from app import item_resource
-from app import auth_resource
+from app.resources import item_resource
+from app.resources import auth_resource
 from fastapi import FastAPI, APIRouter
 
 api_router = APIRouter()

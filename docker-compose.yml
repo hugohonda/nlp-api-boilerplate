@@ -1,53 +1,62 @@
-version: "3.7"
-services:
+version: "3.9"
 
-  fastapi:
-    container_name: fastapi
+services:
+  api:
+    container_name: api
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./api/Dockerfile
     restart: always
     volumes:
-      - ./app:/app/app
-      - ./application.py:/app/application.py
-      - ./main.py:/app/main.py
+      - ./api/app:/app/app
+      - ./api/main.py:/app/main.py
     env_file:
-      - ./.env
+      - ./api/.env
     depends_on:
+      - redis
       - elasticsearch
     command: uvicorn main:app --host 0.0.0.0 --port 8989 --reload
     ports:
-      - 8989:8989
+      - ${API_PORT}:8989
     networks:
-      - es-net
+      - api-net
+
+  redis:
+    container_name: redis
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - 6379:6379
+    networks:
+      - api-net
 
   elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_STACK_VERSION}
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-    volumes:
-      - ./esdata:/usr/share/elasticsearch/data
     environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
       - xpack.security.enabled=false
-      - "discovery.type=single-node"
+    volumes:
+      - ./esdata:/var/lib/elasticsearch/data
     ports:
-      - 9200:9200
-      - 9300:9300
+      - ${ES_PORT}:9200
     networks:
-      - es-net
+      - api-net
 
   # kibana:
-  #   container_name: cub-kibana
-  #   image: docker.elastic.co/kibana/kibana:8.3.2
+  #   image: docker.elastic.co/kibana/kibana:${ES_STACK_VERSION}
+  #   container_name: kibana
   #   environment:
-  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+  #     - ELASTICSEARCH_HOSTS=http://elasticsearch:${ES_PORT}
   #   depends_on:
   #     - elasticsearch
   #   ports:
   #     - 5601:5601
   #   networks:
-  #     - es-net
+  #     - api-net
 
 
 networks:
-  es-net:
+  api-net:
     driver: bridge
