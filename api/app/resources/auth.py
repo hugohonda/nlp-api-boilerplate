@@ -3,11 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from app.usecases.auth import AuthManager
-from app.usecases.logging import logging
+from app.utils.logging import APILogger
 from pydantic import BaseModel
 
 router = APIRouter()
 auth_manager = AuthManager()
+logger = APILogger()
 
 
 class Token(BaseModel):
@@ -28,11 +29,9 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
         user = auth_manager.authenticate_user(
             form_data.username, form_data.password)
         if not user:
-            error_msg = f"Internal server error: {str(error)}"
-            logging.error(error_msg)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=error_msg,
+                detail=f"Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
         access_token_expires = timedelta(
@@ -45,7 +44,5 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     except HTTPException as error:
         raise error
     except Exception as error:
-        error_msg = f"Internal server error: {str(error)}"
-        logging.error(error_msg)
         raise HTTPException(
-            status_code=500, detail=error_msg)
+            status_code=500, detail=f"Internal server error: {str(error)}")

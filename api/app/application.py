@@ -1,6 +1,6 @@
-from app.resources import item_resource
-from app.resources import auth_resource
-from fastapi import FastAPI, APIRouter
+from app.resources import items
+from app.resources import auth
+from fastapi import FastAPI, APIRouter, Request
 
 api_router = APIRouter()
 
@@ -16,13 +16,13 @@ def create_app():
     )
 
     app.include_router(
-        auth_resource.router,
+        auth.router,
         tags=["Authentication"]
         # dependencies=PROTECTED
     )
 
     app.include_router(
-        item_resource.router,
+        items.router,
         tags=["Items"]
         # dependencies=PROTECTED
     )

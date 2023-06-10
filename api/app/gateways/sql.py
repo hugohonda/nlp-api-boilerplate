@@ -1,5 +1,5 @@
 import sqlite3
-from app.usecases.logging import logging
+from api.app.utils.logging import APILogger
 
 
 class SQLManager:
