@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Annotated
-
+from app.gateways.postgres import client
+from app.utils.logging import logger
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -11,17 +12,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-fake_users_db = {
-    "teste": {
-        "username": "teste",
-        "full_name": "Teste Teste",
-        "email": "teste@example.com",
-        "hashed_password": "$2b$12$dcU.TRVClCu.390jYXDTdeJb/KjNYB/PcOj/ihmDyOj2G/GWeUHlW",
-        "disabled": False,
-    }
-}
-
-
 class TokenData(BaseModel):
     username: str | None = None
 
@@ -29,12 +19,8 @@ class TokenData(BaseModel):
 class User(BaseModel):
     username: str
     email: str | None = None
-    full_name: str | None = None
+    fullname: str | None = None
     disabled: bool | None = None
-
-
-class UserInDB(User):
-    hashed_password: str
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -54,16 +40,11 @@ class AuthManager:
     def get_password_hash(self, password):
         return pwd_context.hash(password)
 
-    def get_user(self, username: str):
-        if username in fake_users_db:
-            user_dict = fake_users_db[username]
-            return UserInDB(**user_dict)
-
     def authenticate_user(self, username: str, password: str):
-        user = self.get_user(username)
+        user = client.check_user_exists(username)
         if not user:
             return False
-        if not self.verify_password(password, user.hashed_password):
+        if not self.verify_password(password, user["hashed_password"]):
             return False
         return user
 
@@ -93,7 +74,7 @@ class AuthManager:
             token_data = TokenData(username=username)
         except JWTError:
             raise credentials_exception
-        user = self.get_user(fake_users_db, username=token_data.username)
+        user = client.check_user_exists(token_data.username)
         if user is None:
             raise credentials_exception
         return user

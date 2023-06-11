@@ -1,40 +1,51 @@
 from typing import List
 from pydantic import BaseModel
 
-# Definição do modelo de dados de medicamentos
+
 class Item(BaseModel):
     id: str
-    nome: str
+    searchfield: str
+
+    # class Config:
+    #     schema_extra = {
+    #         "example": {
+    #             "items": [
+    #                 {
+    #                     "id": 1,
+    #                     "searchfield": "My text 1"
+    #                 },
+    #                 {
+    #                     "id": 2,
+    #                     "searchfield": "My text 2"
+    #                 }
+    #             ]
+    #         }
+    #     }
 
 
-# Definição da classe
 class ItemBase:
     def __init__(self, es):
         self.es = es
         self.index_name = "items_index"
 
-    # Método de busca de produtos
-    def busca_items(self, search_query: str, size: int = 10) -> List[Item]:
-        # Configuração do filtro de busca
+    def get_items(self, search_query: str, size: int = 10) -> List[Item]:
         search_body = {
             "query": {
                 "multi_match": {
                     "query": search_query,
                     "fields": [
-                        "nome"
+                        "searchfield"
                     ]
                 }
             },
             "size": size
         }
 
-        # Busca no Elasticsearch
         response = self.es.search(index=self.index_name, body=search_body)
 
-        # Transforma os resultados em objetos Medicamento
         items = [Item(
             id=hit['_id'],
-            nome=hit['_source']['nome']
+            searchfield=hit['_source']['searchfield']
         ) for hit in response['hits']['hits']]
 
         return items

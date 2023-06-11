@@ -5,7 +5,7 @@ import logging
 class APILogger:
     def __init__(self):
         self.logger = logging.getLogger("api_logger")
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
 
         formatter = logging.Formatter(
             "%(asctime)s - %(levelname)s - %(message)s",
@@ -14,7 +14,7 @@ class APILogger:
 
         # Create and configure a StreamHandler
         stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.DEBUG)
+        stream_handler.setLevel(logging.INFO)
         stream_handler.setFormatter(formatter)
 
         # Add the StreamHandler to the logger
@@ -46,3 +46,6 @@ class APILogger:
 
     def exception(self, message):
         self.logger.exception(message)
+
+
+logger = APILogger()

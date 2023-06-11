@@ -3,24 +3,23 @@ from fastapi import APIRouter
 from typing import List
 from app.usecases.items import Item, ItemBase
 from app.gateways.elastic import es_client
-from app.utils.logging import APILogger
+from app.utils.logging import logger
 
 router = APIRouter()
 items_base = ItemBase(es_client)
-logger = APILogger()
 
 
 @router.get("/items/{consulta}")
-async def busca_items(consulta: str, size: int = 10) -> List[Item]:
+async def get_items(query: str, size: int = 10) -> List[Item]:
     """
-    Retorna uma lista de produtos correspondentes à busca.
+    Returns a list of products matching the search query.
 
-    Parâmetros:
-    - consulta: string de busca
-    - size: número máximo de resultados (padrão 10)
+    Parameters:
+    - query: search query string
+    - size: maximum number of results (default 10)
     """
     try:
-        items = items_base.busca_items(consulta, size)
+        items = items_base.get_items(query, size)
         if not items:
             error_msg = "No item found"
             logger.info(error_msg)

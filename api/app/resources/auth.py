@@ -3,12 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from app.usecases.auth import AuthManager
-from app.utils.logging import APILogger
+from app.utils.logging import logger
 from pydantic import BaseModel
 
 router = APIRouter()
 auth_manager = AuthManager()
-logger = APILogger()
 
 
 class Token(BaseModel):
@@ -19,11 +18,11 @@ class Token(BaseModel):
 @router.post("/token", response_model=Token)
 async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
-    Retorna um token caso o login seja bem sucedido.
+    Returns a token if the login is successful.
 
-    Parâmetros:
-    - username: usuário
-    - password: senha
+    Parameters:
+    - username: username string
+    - password: password string
     """
     try:
         user = auth_manager.authenticate_user(
@@ -39,7 +38,7 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
             minutes=auth_manager.jwt_token_expire_minutes)
 
         access_token = auth_manager.create_access_token(
-            data={"sub": user.username}, expires_delta=access_token_expires
+            data={"sub": user["username"]}, expires_delta=access_token_expires
         )
 
         return {"access_token": access_token, "token_type": "bearer"}
@@ -47,5 +46,7 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     except HTTPException as error:
         raise error
     except Exception as error:
+        error_msg = f"Create access token internal server error: {str(error)}"
+        logger.error(error_msg)
         raise HTTPException(
-            status_code=500, detail=f"Internal server error: {str(error)}")
+            status_code=500, detail=error_msg)
