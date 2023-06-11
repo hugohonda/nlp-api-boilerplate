@@ -1,31 +1,31 @@
 from fastapi import HTTPException
 from fastapi import APIRouter
 from typing import List
-from app.usecases.items import Item, ItemBase
+from app.usecases.items import TextResult, TextSearch
 from app.gateways.elastic import es_client
 from app.utils.logging import logger
 
 router = APIRouter()
-items_base = ItemBase(es_client)
+textsearch = TextSearch(es_client)
 
 
-@router.get("/items/{consulta}")
-async def get_items(query: str, size: int = 10) -> List[Item]:
+@router.get("/{search}")
+async def textual_search(search: str, size: int = 10) -> List[TextResult]:
     """
-    Returns a list of products matching the search query.
+    Returns a list of products matching the textual search query.
 
     Parameters:
     - query: search query string
     - size: maximum number of results (default 10)
     """
     try:
-        items = items_base.get_items(query, size)
-        if not items:
-            error_msg = "No item found"
+        results = textsearch.search(search, size)
+        if not results:
+            error_msg = "No result found"
             logger.info(error_msg)
             raise HTTPException(
                 status_code=404, detail=error_msg)
-        return items
+        return results
 
     except HTTPException as error:
         raise error
