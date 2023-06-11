@@ -1,8 +1,8 @@
-# NLP Boilerplate Project
+# NLP API Boilerplate
 
-Welcome to the NLP Boilerplate project
+Welcome to the NLP API Boilerplate
 
-This is a Python-based boilerplate project for Natural Language Processing (NLP) tasks. It comes pre-configured with essential components that can be useful for starting a NLP project.
+This is a Python-based boilerplate project for Natural Language Processing (NLP) tasks. It comes pre-configured with components that can be useful for starting a NLP project.
 
 ## Features
 
@@ -58,8 +58,6 @@ Make sure you have the following software installed:
   cp .env.example .env
   ```
 
-<!-- 2. Modify the `config.py` file to customize the application settings and configurations. -->
-
 ### Running the Application
 
 To start the NLP Boilerplate application, follow these steps:
@@ -87,6 +85,8 @@ Once the application is up and running, you can access it by visiting `http://lo
 ### API Documentation
 
 The API documentation is available at `http://localhost:8989/docs`, providing details about the available endpoints and their usage.
+
+### References
 
 - [FastAPI](https://fastapi.tiangolo.com)
 - [PostgreSQL](https://www.postgresql.org)
