@@ -52,10 +52,14 @@ Make sure you have the following software installed:
 
 ### Configuration
 
-- Rename the `.env.example` file to `.env` and update the configuration variables as per your needs.
+- Rename the example env files (`.env.example` -> `.env`) and update the configuration variables as per your needs.
 
   ```bash
   cp .env.example .env
+  ```
+
+  ```bash
+  cp ./api/.env.example ./api/.env
   ```
 
 ### Running the Application
