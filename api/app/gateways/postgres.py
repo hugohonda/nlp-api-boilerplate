@@ -38,7 +38,7 @@ class PostgresClient:
         try:
             columns = """
                 username TEXT PRIMARY KEY,
-                full_name TEXT,
+                fullname TEXT,
                 email TEXT,
                 hashed_password TEXT,
                 disabled BOOLEAN
