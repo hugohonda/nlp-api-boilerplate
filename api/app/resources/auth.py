@@ -34,11 +34,14 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
                 detail=f"Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+
         access_token_expires = timedelta(
             minutes=auth_manager.jwt_token_expire_minutes)
+
         access_token = auth_manager.create_access_token(
             data={"sub": user.username}, expires_delta=access_token_expires
         )
+
         return {"access_token": access_token, "token_type": "bearer"}
 
     except HTTPException as error:
