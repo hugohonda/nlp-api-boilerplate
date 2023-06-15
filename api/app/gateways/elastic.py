@@ -6,7 +6,8 @@ load_dotenv()
 
 
 class ElasticsearchClient:
-    def __init__(self, host, port, user, password):
+    def __init__(self, scheme, host, port, user, password):
+        self.scheme = scheme
         self.host = host
         self.port = port
         self.user = user
@@ -17,7 +18,7 @@ class ElasticsearchClient:
         try:
             self.connection = Elasticsearch(
                 [{
-                    'scheme': 'http',
+                    'scheme': self.scheme,
                     'host': self.host,
                     'port': self.port,
                 }],
@@ -34,6 +35,7 @@ class ElasticsearchClient:
 
 
 client = ElasticsearchClient(
+    scheme=os.getenv('ELASTIC_SCHEME', 'http'),
     host=os.getenv('ELASTIC_HOST', 'elasticsearch'),
     port=int(os.getenv('ELASTIC_PORT', 9200)),
     user=os.getenv('ELASTIC_USER', 'elastic'),

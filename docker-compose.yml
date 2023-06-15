@@ -15,6 +15,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      # elasticsearch:
+      #   condition: service_healthy
     command: uvicorn main:app --host 0.0.0.0 --port 8989 --reload
     ports:
       - ${API_PORT}:8989
@@ -35,7 +37,7 @@ services:
       - ${POSTGRES_PORT}:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
     networks:
@@ -51,20 +53,25 @@ services:
     networks:
       - api-net
 
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:${ES_STACK_VERSION}
-  #   container_name: elasticsearch
-  #   restart: always
-  #   environment:
-  #     - discovery.type=single-node
-  #     - ES_JAVA_OPTS=-Xms1g -Xmx1g
-  #     - xpack.security.enabled=false
-  #   volumes:
-  #     - ./esdata:/var/lib/elasticsearch/data
-  #   ports:
-  #     - ${ES_PORT}:9200
-  #   networks:
-  #     - api-net
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_STACK_VERSION}
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    volumes:
+      - ./esdata:/var/lib/elasticsearch/data
+    ports:
+      - ${ELASTIC_PORT}:9200
+    healthcheck:
+      test: curl -s ${ELASTIC_SCHEME}://${ELASTIC_HOST}:9200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - api-net
 
   # label-studio:
   #   image: heartexlabs/label-studio:latest
